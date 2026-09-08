@@ -1,0 +1,39 @@
+{
+  "version": "2026-08-31-v1",
+  "source_policy": "Only verified product terms are marked complete; account channel overrides remain account-local.",
+  "funds": {
+    "009051": {
+      "subscription_fee": {"status": "COMPLETE", "rate_source": "ACCOUNT_SETTING_OVERRIDE", "tiers": [{"min": 0, "max": 1000000, "rate": null}, {"min": 1000000, "max": 5000000, "rate": 0.003}, {"min": 5000000, "max": null, "rate": null}]},
+      "sales_service_fee_rate": 0.0,
+      "management_fee_rate": 0.0015,
+      "custody_fee_rate": 0.0005,
+      "redemption_fee": {"status": "COMPLETE", "tiers": [{"max_days": 6, "rate": 0.015}, {"max_days": 29, "rate": 0.005}, {"max_days": 179, "rate": 0.001}, {"max_days": null, "rate": 0.0}]},
+      "fee_status": "FEE_COMPLETE",
+      "product_status": "OPEN",
+      "source": "易方达官方产品费率页面；账户设置中的渠道申购费覆盖仅对当前账户生效",
+      "channel_discount": "ACCOUNT_SETTING_OVERRIDE"
+    },
+    "009052": {
+      "subscription_fee": {"status": "COMPLETE", "rate_source": "OFFICIAL", "tiers": [{"min": 0, "max": null, "rate": 0.0}]},
+      "sales_service_fee_rate": 0.001,
+      "management_fee_rate": 0.0015,
+      "custody_fee_rate": 0.0005,
+      "redemption_fee": {"status": "COMPLETE", "tiers": [{"max_days": 6, "rate": 0.015}, {"max_days": null, "rate": 0.0}]},
+      "fee_status": "FEE_COMPLETE",
+      "product_status": "OPEN",
+      "source": "易方达官方产品费率页面",
+      "channel_discount": "NONE"
+    },
+    "022925": {
+      "subscription_fee": {"status": "COMPLETE", "rate_source": "USER_CONFIRMED_CHANNEL", "tiers": [{"min": 0, "max": null, "rate": 0.0}]},
+      "sales_service_fee_rate": 0.0,
+      "management_fee_rate": 0.0015,
+      "custody_fee_rate": 0.0005,
+      "redemption_fee": {"status": "COMPLETE", "tiers": [{"max_days": 6, "rate": 0.015}, {"max_days": null, "rate": 0.0}]},
+      "fee_status": "FEE_COMPLETE",
+      "product_status": "PENSION_ONLY",
+      "source": "User-confirmed execution channel terms: 0% subscription fee; official product terms confirm 0.15% management + 0.05% custody (0.20% annual operating fees) and 0% sales service fee.",
+      "channel_discount": "USER_CONFIRMED_ZERO"
+    }
+  }
+}

@@ -23,9 +23,16 @@ jobs:
         shell: pwsh
         run: ./release/build_release_windows.ps1
       - name: Build installer
-        uses: crazy-max/ghaction-inno-setup@v3
-        with:
-          path: release/S2Dashboard.iss
+        shell: pwsh
+        run: |
+          $iscc = Join-Path $env:ProgramFiles(x86) 'Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $iscc)) {
+            $iscc = Join-Path $env:ProgramFiles 'Inno Setup 6\ISCC.exe'
+          }
+          if (-not (Test-Path $iscc)) {
+            throw 'Inno Setup 6 compiler not found on the Windows runner.'
+          }
+          & $iscc 'release/S2Dashboard.iss'
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:

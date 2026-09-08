@@ -1,0 +1,16 @@
+.overview-support-grid{grid-template-columns:minmax(260px,.9fr) minmax(300px,1.05fr) minmax(340px,1.2fr);gap:18px;margin-top:18px;align-items:stretch}
+.overview-support-grid>.card{min-width:0}
+.overview-support-grid h2{margin:0 0 16px;font-size:19px;line-height:1.35;white-space:nowrap}
+.overview-support-grid .metric-row{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:44px;padding:10px 12px;font-size:14px;line-height:1.4}
+.overview-support-grid .metric-row span,.overview-support-grid .metric-row b{white-space:nowrap}
+.overview-support-grid .metric-row b{font-size:16px;font-variant-numeric:tabular-nums}
+.rules-card .rule-current{background:#edf4ff;border-radius:8px;color:#145dcc}
+.performance-card .note{margin:18px 0 0;line-height:1.65;font-size:14px}
+.health-row{display:grid;grid-template-columns:minmax(135px,1fr) auto auto;align-items:center;gap:14px;min-height:48px;border-bottom:1px solid var(--line);font-size:14px}
+.health-row span,.health-row b,.health-row time{white-space:nowrap}
+.health-row b{color:var(--green);font-size:13px}
+.health-row time{color:var(--muted);font-variant-numeric:tabular-nums}
+.health-card .update-time{margin:18px 0 0}
+@media(max-width:1320px){.overview-support-grid{grid-template-columns:repeat(2,minmax(300px,1fr))}.overview-support-grid .health-card{grid-column:1/-1}.health-card{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:18px}.health-card h2,.health-card .update-time{grid-column:1/-1}.health-row{grid-template-columns:1fr;gap:4px;padding:10px 0;align-content:start}}
+@media(max-width:900px){.overview-support-grid{grid-template-columns:1fr}.overview-support-grid .health-card{grid-column:auto}.health-card{display:block}.health-row{grid-template-columns:minmax(135px,1fr) auto auto;gap:12px}}
+.button-row .secondary.active{background:#eaf2ff;border-color:#8db3f5;color:#145dcc;font-weight:700}

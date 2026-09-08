@@ -1,0 +1,24 @@
+# Local user/account state. Never commit these paths.
+app/data/multi_user/
+app/data/raw/
+app/data/incoming/
+app/data/qa/
+app/data/qa_account_maintenance_browser/
+app/data/qa_multi_user/
+app/data/qa_secrets/
+app/backups/
+app/exports/
+app/logs/
+app/runtime/
+app/.pytest_cache/
+app/**/__pycache__/
+app/config/dashboard_python_path.txt
+release_build/
+*.sqlite3
+*.db
+*.log
+.venv/
+venv/
+dist/
+build/
+.smoke-data*/

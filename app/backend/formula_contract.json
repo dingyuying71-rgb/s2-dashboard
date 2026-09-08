@@ -1,0 +1,73 @@
+{
+  "contract_version": "S2-account-v3.0-frozen",
+  "purpose": "Deterministic account-accounting contract for S2 V2 Monthly Target; no UI formulas are authoritative.",
+  "precision": {"engine": "Decimal, precision 38", "money_display": "RMB 0.01, ROUND_HALF_EVEN", "fund_shares": "high precision internally; product rule at settlement"},
+  "state": {
+    "F": "confirmed FundValue",
+    "C": "StrategyCash: settled, available active cash",
+    "R": "ReserveCash: excluded permanently from S2 until typed internal transfer R_TO_PENDING",
+    "P_lots": "PendingCashLots with lot_id,event_id,amount,remaining_amount,created_at,cleared_at,eligible_batch_id,status,provenance",
+    "U": ["PENDING_SUBSCRIPTION", "REDEMPTION_RECEIVABLE"],
+    "Payable": "recognized obligation, subtracted from total wealth",
+    "Units": "cash-flow-adjusted account units",
+    "NAV": "TotalWealth / Units",
+    "NAV_HWM": "highest pre-fee NAV evaluated at a completed monthly execution"
+  },
+  "identity": "TotalWealth = F + C + R + sum(open Pending lots) + sum(open Unsettled assets) - Payable",
+  "investable_assets_before_trade": "F + C after merging only frozen eligible pending lots; R, ineligible pending, subscription pending and redemption receivable are excluded.",
+  "cutoff": {
+    "signal": "month-end trading day T close, independent of account balances",
+    "execution": "T+1",
+    "funds_cutoff": "T+1 14:30 Asia/Shanghai",
+    "eligible": "cleared_at <= cutoff AND eligible_batch_id == current batch; frozen at cutoff",
+    "late_funds": "cleared after cutoff receive the next batch id and cannot enter the frozen batch"
+  },
+  "idempotency": "Every external contribution, withdrawal and system event has immutable unique event_id. Replayed id returns ALREADY_PROCESSED and never changes state.",
+  "external_flows": {
+    "contribution": "D > 0: add a pending lot and Units += D/NAV_before. Record only once when ownership of money enters account.",
+    "withdrawal": "W > 0 and W <= withdrawable assets; Units -= paid_amount/NAV_before at the actual external-payment time. Rejected otherwise.",
+    "withdrawal_priority": ["R", "cleared pending", "C", "F net of fee"],
+    "non_rebalance": "A non-monthly withdrawal raises only W plus required fee; it never targets S2 exposure."
+  },
+  "monthly_order": [
+    "Process cleared external flows and units through cutoff.",
+    "Freeze eligible pending lots.",
+    "Merge eligible lots P -> C once.",
+    "Measure current pre-lock NAV.",
+    "Calculate NAV-HWM profit lock.",
+    "Transfer lock from active domain to Reserve domain.",
+    "Compute active investable assets after lock.",
+    "Read frozen market-only S2 exposure p.",
+    "Solve fee-aware final fund target.",
+    "Execute exactly one net fund trade and create settlement lots.",
+    "Update state, NAV/HWM and audit log."
+  ],
+  "profit_lock": {
+    "formula": "max(0, NAV_prelock - NAV_HWM) * Units * lock_ratio + deferred_profit_lock",
+    "hwm_update": "NAV_HWM = max(NAV_HWM, NAV_prelock), before trade fees; this prevents re-locking the identical pre-fee profit band. Fees remain a genuine NAV drawdown.",
+    "units": "ProfitLock is an internal transfer; it creates neither Units nor XIRR flow.",
+    "liquidity": "Use C first; if required, fund the reserve via the same monthly net sale. Never create a separate round-trip trade. If the requested lock would make sale fees infeasible, execute the maximum fee-feasible amount and retain the remainder as deferred_profit_lock."
+  },
+  "fee_model": {
+    "cost": "fee_rate * abs(F_final - F_current)",
+    "target": "F_final = p * (ActiveWealth_before_trade - cost)",
+    "buy": "F_final = p*(A + fee*F_current)/(1+p*fee)",
+    "sell": "F_final = p*(A - fee*F_current)/(1-p*fee)",
+    "hold": "F_final = F_current, cost=0",
+    "allowed_test_rates": [0, 0.001, 0.003, 0.005]
+  },
+  "settlement": {
+    "subscription": "C -> PENDING_SUBSCRIPTION; it remains in TotalWealth but is not AvailableCash or confirmed F until settlement.",
+    "redemption": "F -> REDEMPTION_RECEIVABLE net of fee; receivable counts once in TotalWealth and cannot be spent before availability.",
+    "availability": "Settlement moves receivable to C/R or pays a withdrawal. The same asset is never simultaneously F and receivable/cash."
+  },
+  "returns": {
+    "TWR": "NAV / initial_NAV - 1; external flows change units rather than NAV.",
+    "XIRR": "initial/additional contributions negative; cash actually outside the account positive; terminal F+C+R+P+U-Payable positive. Pending, reserve and ProfitLock are internal."
+  },
+  "dividends": {
+    "TOTAL_RETURN_EMBEDDED": "Block standalone cash dividends to prevent double counting.",
+    "PRICE_PLUS_CASH": "REINVEST/STRATEGY_CASH/PENDING/RESERVE are internal income; only distribution outside is an external withdrawal. Dividends are never external contributions."
+  },
+  "audit_log": ["event_id", "event_type", "timestamp", "before_state", "external_flow", "internal_transfer", "trade", "fee", "settlement_change", "after_state", "nav_before", "nav_after", "units_before", "units_after", "hwm_before", "hwm_after", "status"]
+}

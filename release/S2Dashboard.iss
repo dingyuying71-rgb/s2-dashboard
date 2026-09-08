@@ -1,5 +1,5 @@
 #define MyAppName "S2 中证红利策略仪表盘"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "S2 Dashboard"
 #define MyAppExeName "S2Dashboard.exe"
 
@@ -13,7 +13,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 OutputDir=..\release_build\installer
-OutputBaseFilename=S2Dashboard_Setup_1.0.0
+OutputBaseFilename=S2Dashboard_Windows_Setup_1.0.1
 SetupIconFile=..\app\assets\s2-dashboard.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2/max

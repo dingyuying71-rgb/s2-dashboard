@@ -22,16 +22,14 @@ jobs:
       - name: Build Windows package
         shell: pwsh
         run: ./release/build_release_windows.ps1
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
       - name: Build installer
         shell: pwsh
         run: |
-          $iscc = Join-Path $env:ProgramFiles(x86) 'Inno Setup 6\ISCC.exe'
-          if (-not (Test-Path $iscc)) {
-            $iscc = Join-Path $env:ProgramFiles 'Inno Setup 6\ISCC.exe'
-          }
-          if (-not (Test-Path $iscc)) {
-            throw 'Inno Setup 6 compiler not found on the Windows runner.'
-          }
+          $iscc = Get-ChildItem 'C:/Program Files*/Inno Setup */ISCC.exe' -File | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $iscc) { throw 'Inno Setup compiler not found on the Windows runner.' }
           & $iscc 'release/S2Dashboard.iss'
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4

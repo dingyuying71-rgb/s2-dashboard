@@ -1,0 +1,7 @@
+{
+  "contract_version": "S2-account-v3.0-frozen",
+  "authoritative_source": "../backend/formula_contract.json",
+  "sha256": "610972621444ED9DD95DC7DE5D443ED2D2FD075A8D95D8FF33B637DC490CE786",
+  "status": "IMMUTABLE_LEGACY",
+  "rule": "This manifest points to the frozen V3 contract. It must never be reinterpreted by V4."
+}

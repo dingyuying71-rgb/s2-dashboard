@@ -1,0 +1,67 @@
+{
+  "contract_version": "S2-account-v4.0-frozen",
+  "status": "FROZEN",
+  "frozen_at": "2026-08-23T20:35:58+08:00",
+  "architecture": "E3+A3",
+  "inherits_identity_from": "S2-account-v3.0-frozen",
+  "freeze_policy": "Account mathematics, event semantics, Unitized NAV, TWR/XIRR, settlement, execution accounting and pending cancellation accounting cannot be changed under this contract version.",
+  "layers": {
+    "official_signal": "immutable market-only target exposure",
+    "recommendation": "immutable strategy suggestion; never an account event",
+    "execution": "immutable user-reported fund-platform order",
+    "account_state": "changed only by reported, confirmed and settled real events"
+  },
+  "identity": "TotalWealth = F + C + R + open Pending + SubscriptionPending + RedemptionReceivable - Payable",
+  "execution": {
+    "lifecycle": ["EXECUTION_REPORTED", "FUND_ORDER_CONFIRMED", "SETTLEMENT"],
+    "recommended_amount": "strategy/audit field only; prohibited as account balance input",
+    "direction_mismatch": "reject ACTION_MISMATCH; no manual override in v4.0",
+    "zero_actual": "reject INVALID_ACTUAL_AMOUNT without account event",
+    "same_direction_over_recommendation": "allowed within available cash/redeemable units; mark execution_deviation",
+    "buy": {
+      "input": "cash_debited, the platform total debit",
+      "decomposition": "cash_debited = principal + fee when fee is known",
+      "unknown_fee": "fee remains null/UNKNOWN; provisional principal equals cash_debited until confirmation",
+      "report_effect": "C -> PENDING_SUBSCRIPTION using actual cash only",
+      "confirm_effect": "PENDING_SUBSCRIPTION -> confirmed FundValue/FundUnits exactly once"
+    },
+    "sell": {
+      "input": "redemption_units; estimated_redemption_amount is non-authoritative",
+      "report_effect": "reserve redeemable units; do not invent cash",
+      "confirm_effect": "derecognize confirmed FundValue/FundUnits -> REDEMPTION_RECEIVABLE",
+      "settle_effect": "REDEMPTION_RECEIVABLE -> C or explicit external payment"
+    },
+    "correction": "future immutable EXECUTION_CORRECTION referencing the original event; no UPDATE"
+  },
+  "pending": {
+    "external_cancellation_event": "PENDING_CANCELLATION",
+    "reserve_transfer_event": "PENDING_TO_RESERVE_TRANSFER",
+    "cancellable_statuses": ["PENDING", "CLEARED_NOT_ELIGIBLE", "PARTIALLY_CANCELLED"],
+    "noncancellable_statuses": ["ELIGIBLE", "ELIGIBLE_FROZEN", "MERGED", "CONSUMED", "CANCELLED", "WITHDRAWN"],
+    "external_math": "P -= W; Units -= W/NAV_before; external XIRR withdrawal; NAV/HWM unchanged",
+    "reserve_math": "P -= W; R += W; no external flow; Units/NAV/HWM unchanged",
+    "partial": "multiple distinct event_ids may reduce remaining_amount; never below zero",
+    "history": "original contribution is immutable and always retained"
+  },
+  "idempotency": {
+    "event": "event_id unique; replay returns ALREADY_PROCESSED",
+    "signal": "one active execution per official_signal_id even when event_id differs",
+    "transaction": "event, engine state and projections commit atomically"
+  },
+  "ordering": [
+    "due settlement through cutoff",
+    "effective external flows through cutoff",
+    "freeze eligible pending",
+    "merge eligible pending",
+    "profit lock and HWM",
+    "immutable recommendation",
+    "execution report",
+    "confirmation and settlement at their real effective times"
+  ],
+  "migration": {
+    "mode": "additive forward only",
+    "legacy_execution": "retain V3 recommended-target account effect without recomputation",
+    "version_default": "events without version are V3 legacy",
+    "rollback": "restore pre-V4 SQLite backup"
+  }
+}
